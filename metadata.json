@@ -1,0 +1,8 @@
+{
+  "name": "Lawan!! Nilai 100 - Asesmen Kemampuan Akademik SMA",
+  "description": "Aplikasi Asesmen Tes Kemampuan Akademik (TKA) SMA untuk Kelas 10 dan 11 dengan pemantauan real-time guru, sistem token, dan analisis hasil lengkap.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

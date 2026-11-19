@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e11d48" />
+      <stop offset="52%" stop-color="#f97316" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#4c0519" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+  
+  <!-- App Icon Rounded Background (Coral/Rose to Orange/Amber) -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  
+  <!-- Top Right Warm Amber Highlight -->
+  <circle cx="395" cy="118" r="132" fill="#fde68a" fill-opacity="0.28" />
+  
+  <!-- Graduation Cap (Mortarboard) -->
+  <g filter="url(#shadow)">
+    <!-- Cap Diamond / Top -->
+    <polygon points="256,82 412,158 256,234 100,158" fill="#ffffff" />
+    
+    <!-- Cap Base / Skullcap -->
+    <polygon points="256,246 370,190 370,244 256,300 142,244 142,190" fill="#ffe4e6" />
+    
+    <!-- Tassel String and Button -->
+    <path d="M 370,194 L 370,272 C 370,287 355,295 340,287" fill="none" stroke="#fef08a" stroke-width="8" stroke-linecap="round" />
+    <circle cx="340" cy="287" r="14" fill="#fef08a" />
+  </g>
+
+  <!-- Text: LAWAN!! NILAI 100 -->
+  <text x="256" y="358" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="30" fill="#ffffff" letter-spacing="2">LAWAN!!</text>
+  <text x="256" y="420" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="50" fill="#ffffff" letter-spacing="2">NILAI 100</text>
+</svg>

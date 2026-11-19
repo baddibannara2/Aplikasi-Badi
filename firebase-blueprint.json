@@ -1,0 +1,347 @@
+{
+  "entities": {
+    "AppConfig": {
+      "title": "AppConfig",
+      "description": "Global assessment configuration, token registry, intro slide toggle, and deletion tombstones synced across devices.",
+      "type": "object",
+      "properties": {
+        "activeToken": {
+          "type": "string",
+          "description": "Primary active assessment token code.",
+          "maxLength": 64
+        },
+        "isTokenActive": {
+          "type": "boolean",
+          "description": "Whether the primary token is currently active."
+        },
+        "examDurationMinutes": {
+          "type": "number",
+          "description": "Default assessment duration in minutes."
+        },
+        "teacherPin": {
+          "type": "string",
+          "description": "Teacher dashboard PIN/password.",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "schoolNameDefault": {
+          "type": "string",
+          "description": "Default school name for new tokens and students.",
+          "maxLength": 200
+        },
+        "previousTokens": {
+          "type": "array",
+          "description": "List of previously generated token strings."
+        },
+        "tokenList": {
+          "type": "array",
+          "description": "Configured assessment token items including token, school, grade, durationMinutes, isActive, createdAt, and optional surveyUrl."
+        },
+        "isIntroSlideEnabled": {
+          "type": "boolean",
+          "description": "Whether the student intro slide screen is enabled before login."
+        },
+        "introSlidesInitialized": {
+          "type": "boolean",
+          "description": "Indicates default intro slides have been seeded."
+        },
+        "deletedTokens": {
+          "type": "object",
+          "description": "Map of deleted token strings to deletion epoch timestamps."
+        },
+        "lastBackupDate": {
+          "type": "string",
+          "description": "Last backup ISO date string.",
+          "maxLength": 100
+        },
+        "lastRestoredAt": {
+          "type": "number",
+          "description": "Timestamp of last full backup restore."
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Last modification epoch timestamp in milliseconds."
+        }
+      },
+      "required": [
+        "activeToken",
+        "isTokenActive",
+        "examDurationMinutes",
+        "teacherPin",
+        "schoolNameDefault",
+        "isIntroSlideEnabled",
+        "updatedAt"
+      ]
+    },
+    "IntroSlide": {
+      "title": "IntroSlide",
+      "description": "Customizable welcome slide displayed to students after clicking Masuk and before Student Login.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 3000
+        },
+        "imageUrl": {
+          "type": "string",
+          "maxLength": 900000
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "displayMode": {
+          "type": "string",
+          "enum": ["card", "image_only"]
+        },
+        "order": {
+          "type": "number"
+        },
+        "updatedAt": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "imageUrl",
+        "isActive",
+        "displayMode",
+        "order",
+        "updatedAt"
+      ]
+    },
+    "StudentSession": {
+      "title": "StudentSession",
+      "description": "Student assessment attempt, live progress, answers, and evaluated scores.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "grade": {
+          "type": "string",
+          "enum": ["10 SMA", "11 SMA"]
+        },
+        "school": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "tokenUsed": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "durationMinutes": {
+          "type": "number"
+        },
+        "startTime": {
+          "type": "number"
+        },
+        "lastActiveTime": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["mengerjakan", "selesai", "belum_mulai"]
+        },
+        "currentQuestionIndex": {
+          "type": "number"
+        },
+        "answeredCount": {
+          "type": "number"
+        },
+        "doubtfulCount": {
+          "type": "number"
+        },
+        "answers": {
+          "type": "object"
+        },
+        "totalScore": {
+          "type": "number"
+        },
+        "mathScore": {
+          "type": "number"
+        },
+        "indoScore": {
+          "type": "number"
+        },
+        "englishScore": {
+          "type": "number"
+        },
+        "predicate": {
+          "type": "string",
+          "enum": ["Istimewa", "Baik", "Memadai", "Kurang"]
+        },
+        "timeSpentSeconds": {
+          "type": "number"
+        },
+        "completedAt": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "grade",
+        "school",
+        "tokenUsed",
+        "startTime",
+        "lastActiveTime",
+        "status",
+        "currentQuestionIndex",
+        "answeredCount",
+        "doubtfulCount",
+        "answers"
+      ]
+    },
+    "Question": {
+      "title": "Question",
+      "description": "Assessment question item for Bahasa Indonesia, Bahasa Inggris, or Matematika (SMA Kurikulum Merdeka & TKA SMA).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "grade": {
+          "type": "string",
+          "enum": ["10 SMA", "11 SMA"]
+        },
+        "subject": {
+          "type": "string",
+          "enum": ["Bahasa Indonesia", "Bahasa Inggris", "Matematika"]
+        },
+        "questionFormat": {
+          "type": "string",
+          "enum": ["Reguler Kurikulum Merdeka", "TKA SMA Terbaru"]
+        },
+        "topic": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "cognitiveLevel": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "type": {
+          "type": "string",
+          "enum": ["single_choice", "multiple_choice", "true_false"]
+        },
+        "stimulusTitle": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "stimulusContent": {
+          "type": "string",
+          "maxLength": 20000
+        },
+        "stimulusType": {
+          "type": "string",
+          "enum": ["text", "table", "dialogue", "infographic"]
+        },
+        "stimulusTableData": {
+          "type": "object"
+        },
+        "stimulusNote": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "questionText": {
+          "type": "string",
+          "maxLength": 5000
+        },
+        "options": {
+          "type": "array"
+        },
+        "statements": {
+          "type": "array"
+        },
+        "correctAnswer": {
+          "type": "string"
+        },
+        "explanation": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "keyTakeaway": {
+          "type": "string",
+          "maxLength": 3000
+        }
+      },
+      "required": [
+        "id",
+        "grade",
+        "subject",
+        "topic",
+        "cognitiveLevel",
+        "type",
+        "stimulusTitle",
+        "stimulusContent",
+        "stimulusType",
+        "questionText",
+        "correctAnswer",
+        "explanation",
+        "keyTakeaway"
+      ]
+    },
+    "DeletedSession": {
+      "title": "DeletedSession",
+      "description": "Tombstone marker preventing deleted student sessions from being resurrected by stale offline clients.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "deletedAt": {
+          "type": "number"
+        }
+      },
+      "required": ["id", "deletedAt"]
+    }
+  },
+  "firestore": {
+    "/app_config/{configId}": {
+      "schema": { "$ref": "#/entities/AppConfig" },
+      "description": "Global application configuration document (ID: main)."
+    },
+    "/intro_slides/{slideId}": {
+      "schema": { "$ref": "#/entities/IntroSlide" },
+      "description": "Ordered student intro slides synced in real time across devices."
+    },
+    "/student_sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/StudentSession" },
+      "description": "Active and completed student assessment sessions."
+    },
+    "/questions/{questionId}": {
+      "schema": { "$ref": "#/entities/Question" },
+      "description": "Customized assessment questions bank."
+    },
+    "/deleted_sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/DeletedSession" },
+      "description": "Deletion tombstones for removed student sessions."
+    }
+  }
+}

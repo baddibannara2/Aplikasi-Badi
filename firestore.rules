@@ -1,0 +1,284 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidAppConfig(data) {
+      return data.keys().hasAll([
+          'activeToken',
+          'isTokenActive',
+          'examDurationMinutes',
+          'teacherPin',
+          'schoolNameDefault',
+          'isIntroSlideEnabled',
+          'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'activeToken',
+          'isTokenActive',
+          'examDurationMinutes',
+          'teacherPin',
+          'schoolNameDefault',
+          'previousTokens',
+          'tokenList',
+          'isIntroSlideEnabled',
+          'introSlidesInitialized',
+          'deletedTokens',
+          'lastBackupDate',
+          'lastRestoredAt',
+          'updatedAt'
+        ]) &&
+        data.activeToken is string && data.activeToken.size() <= 64 &&
+        data.isTokenActive is bool &&
+        data.examDurationMinutes is number && data.examDurationMinutes >= 1 && data.examDurationMinutes <= 600 &&
+        data.teacherPin is string && data.teacherPin.size() >= 1 && data.teacherPin.size() <= 64 &&
+        data.schoolNameDefault is string && data.schoolNameDefault.size() <= 200 &&
+        data.isIntroSlideEnabled is bool &&
+        data.updatedAt is number && data.updatedAt >= 0 &&
+        (!('previousTokens' in data) || (
+          data.previousTokens is list &&
+          data.previousTokens.size() <= 200 &&
+          (data.previousTokens.size() == 0 || data.previousTokens[0] is string)
+        )) &&
+        (!('tokenList' in data) || (
+          data.tokenList is list &&
+          data.tokenList.size() <= 100 &&
+          (data.tokenList.size() == 0 || data.tokenList[0] is map)
+        )) &&
+        (!('introSlidesInitialized' in data) || data.introSlidesInitialized is bool) &&
+        (!('deletedTokens' in data) || (data.deletedTokens is map && data.deletedTokens.size() <= 500)) &&
+        (!('lastBackupDate' in data) || (data.lastBackupDate is string && data.lastBackupDate.size() <= 100)) &&
+        (!('lastRestoredAt' in data) || (data.lastRestoredAt is number && data.lastRestoredAt >= 0));
+    }
+
+    function isValidIntroSlide(data) {
+      return data.keys().hasAll([
+          'id',
+          'title',
+          'description',
+          'imageUrl',
+          'isActive',
+          'displayMode',
+          'order',
+          'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id',
+          'title',
+          'description',
+          'imageUrl',
+          'isActive',
+          'displayMode',
+          'order',
+          'updatedAt'
+        ]) &&
+        isValidId(data.id) &&
+        data.title is string && data.title.size() <= 300 &&
+        data.description is string && data.description.size() <= 3000 &&
+        data.imageUrl is string && data.imageUrl.size() <= 900000 &&
+        data.isActive is bool &&
+        data.displayMode in ['card', 'image_only'] &&
+        data.order is number && data.order >= 0 && data.order <= 10000 &&
+        data.updatedAt is number && data.updatedAt >= 0;
+    }
+
+    function isValidStudentSession(data) {
+      return data.keys().hasAll([
+          'id',
+          'name',
+          'grade',
+          'school',
+          'tokenUsed',
+          'startTime',
+          'lastActiveTime',
+          'status',
+          'currentQuestionIndex',
+          'answeredCount',
+          'doubtfulCount',
+          'answers'
+        ]) &&
+        data.keys().hasOnly([
+          'id',
+          'name',
+          'grade',
+          'school',
+          'tokenUsed',
+          'durationMinutes',
+          'startTime',
+          'lastActiveTime',
+          'status',
+          'currentQuestionIndex',
+          'answeredCount',
+          'doubtfulCount',
+          'answers',
+          'totalScore',
+          'mathScore',
+          'indoScore',
+          'englishScore',
+          'predicate',
+          'timeSpentSeconds',
+          'completedAt'
+        ]) &&
+        isValidId(data.id) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 200 &&
+        data.grade in ['10 SMA', '11 SMA'] &&
+        data.school is string && data.school.size() <= 200 &&
+        data.tokenUsed is string && data.tokenUsed.size() <= 64 &&
+        data.startTime is number && data.startTime >= 0 &&
+        data.lastActiveTime is number && data.lastActiveTime >= 0 &&
+        data.status in ['mengerjakan', 'selesai', 'belum_mulai'] &&
+        data.currentQuestionIndex is number && data.currentQuestionIndex >= 0 && data.currentQuestionIndex <= 500 &&
+        data.answeredCount is number && data.answeredCount >= 0 && data.answeredCount <= 500 &&
+        data.doubtfulCount is number && data.doubtfulCount >= 0 && data.doubtfulCount <= 500 &&
+        data.answers is map && data.answers.size() <= 500 &&
+        (!('durationMinutes' in data) || (data.durationMinutes is number && data.durationMinutes >= 1 && data.durationMinutes <= 600)) &&
+        (!('totalScore' in data) || (data.totalScore is number && data.totalScore >= 0 && data.totalScore <= 100)) &&
+        (!('mathScore' in data) || (data.mathScore is number && data.mathScore >= 0 && data.mathScore <= 100)) &&
+        (!('indoScore' in data) || (data.indoScore is number && data.indoScore >= 0 && data.indoScore <= 100)) &&
+        (!('englishScore' in data) || (data.englishScore is number && data.englishScore >= 0 && data.englishScore <= 100)) &&
+        (!('predicate' in data) || data.predicate in ['Istimewa', 'Baik', 'Memadai', 'Kurang']) &&
+        (!('timeSpentSeconds' in data) || (data.timeSpentSeconds is number && data.timeSpentSeconds >= 0 && data.timeSpentSeconds <= 86400)) &&
+        (!('completedAt' in data) || (data.completedAt is number && data.completedAt >= 0));
+    }
+
+    function isValidQuestion(data) {
+      return data.keys().hasAll([
+          'id',
+          'grade',
+          'subject',
+          'topic',
+          'cognitiveLevel',
+          'type',
+          'stimulusTitle',
+          'stimulusContent',
+          'stimulusType',
+          'questionText',
+          'correctAnswer',
+          'explanation',
+          'keyTakeaway'
+        ]) &&
+        data.keys().hasOnly([
+          'id',
+          'grade',
+          'subject',
+          'questionFormat',
+          'topic',
+          'cognitiveLevel',
+          'type',
+          'stimulusTitle',
+          'stimulusContent',
+          'stimulusType',
+          'stimulusTableData',
+          'stimulusNote',
+          'questionText',
+          'options',
+          'statements',
+          'correctAnswer',
+          'explanation',
+          'keyTakeaway'
+        ]) &&
+        isValidId(data.id) &&
+        data.grade in ['10 SMA', '11 SMA'] &&
+        data.subject in ['Bahasa Indonesia', 'Bahasa Inggris', 'Matematika'] &&
+        (!('questionFormat' in data) || data.questionFormat in ['Reguler Kurikulum Merdeka', 'TKA SMA Terbaru']) &&
+        data.topic is string && data.topic.size() <= 300 &&
+        data.cognitiveLevel is string && data.cognitiveLevel.size() <= 100 &&
+        data.type in ['single_choice', 'multiple_choice', 'true_false'] &&
+        data.stimulusTitle is string && data.stimulusTitle.size() <= 500 &&
+        data.stimulusContent is string && data.stimulusContent.size() <= 20000 &&
+        data.stimulusType in ['text', 'table', 'dialogue', 'infographic'] &&
+        data.questionText is string && data.questionText.size() <= 5000 &&
+        (data.correctAnswer is string || data.correctAnswer is list || data.correctAnswer is map) &&
+        data.explanation is string && data.explanation.size() <= 10000 &&
+        data.keyTakeaway is string && data.keyTakeaway.size() <= 3000 &&
+        (!('stimulusTableData' in data) || data.stimulusTableData is map) &&
+        (!('stimulusNote' in data) || (data.stimulusNote is string && data.stimulusNote.size() <= 2000)) &&
+        (!('options' in data) || (data.options is list && data.options.size() <= 20)) &&
+        (!('statements' in data) || (data.statements is list && data.statements.size() <= 20));
+    }
+
+    function isValidDeletedSession(data) {
+      return data.keys().hasAll(['id', 'deletedAt']) &&
+        data.keys().hasOnly(['id', 'deletedAt']) &&
+        isValidId(data.id) &&
+        data.deletedAt is number && data.deletedAt >= 0;
+    }
+
+    // Connection probe document
+    match /test/connection {
+      allow get: if request.time != null;
+    }
+
+    // Global application configuration
+    match /app_config/{configId} {
+      allow get: if configId == 'main';
+      allow list: if false;
+      allow create, update: if configId == 'main' && isValidAppConfig(incoming());
+      allow delete: if false;
+    }
+
+    // Student intro slides (stored per-document so images stay well under 1MB)
+    match /intro_slides/{slideId} {
+      allow get: if isValidId(slideId);
+      allow list: if request.time != null && (request.query.limit == null || request.query.limit <= 100);
+      allow create: if isValidId(slideId) &&
+        isValidIntroSlide(incoming()) &&
+        incoming().id == slideId;
+      allow update: if isValidId(slideId) &&
+        isValidIntroSlide(incoming()) &&
+        incoming().id == slideId &&
+        incoming().id == existing().id;
+      allow delete: if isValidId(slideId);
+    }
+
+    // Student assessment sessions
+    match /student_sessions/{sessionId} {
+      allow get: if isValidId(sessionId);
+      allow list: if request.time != null && (request.query.limit == null || request.query.limit <= 1000);
+      allow create: if isValidId(sessionId) &&
+        isValidStudentSession(incoming()) &&
+        incoming().id == sessionId;
+      allow update: if isValidId(sessionId) &&
+        isValidStudentSession(incoming()) &&
+        incoming().id == sessionId &&
+        incoming().id == existing().id &&
+        (existing().status != 'selesai' || incoming().status == 'selesai');
+      allow delete: if isValidId(sessionId);
+    }
+
+    // Assessment questions bank
+    match /questions/{questionId} {
+      allow get: if isValidId(questionId);
+      allow list: if request.time != null && (request.query.limit == null || request.query.limit <= 500);
+      allow create, update: if isValidId(questionId) &&
+        isValidQuestion(incoming()) &&
+        incoming().id == questionId;
+      allow delete: if isValidId(questionId);
+    }
+
+    // Deleted session tombstones
+    match /deleted_sessions/{sessionId} {
+      allow get: if isValidId(sessionId);
+      allow list: if request.time != null && (request.query.limit == null || request.query.limit <= 1000);
+      allow create, update: if isValidId(sessionId) &&
+        isValidDeletedSession(incoming()) &&
+        incoming().id == sessionId;
+      allow delete: if isValidId(sessionId);
+    }
+  }
+}
